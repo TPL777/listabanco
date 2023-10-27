@@ -33,3 +33,18 @@ bEGIN
 END;
 //
 DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER impede_atualizacao_nome_vazio
+BEFORE UPDATE ON Clientes
+FOREACH ROW
+BEgIN
+    IF NEW.nome IS NULL OR NEW.nome = '' THEN
+        INSERT INTO Auditoria (mensagem)
+        VALUES (CONCAT('Tentativa de atualização do nome para vazio ou NULL em ', NOW()));
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Nome não pode ser vazio ou NULL!';
+    END IF;
+END;
+//
+DELIMITER ;
+
